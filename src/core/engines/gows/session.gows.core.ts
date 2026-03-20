@@ -45,6 +45,7 @@ import { parseMessageIdSerialized } from '@waha/core/utils/ids';
 import {
   isJidBroadcast,
   isJidGroup,
+  isJidStatusBroadcast,
   toCusFormat,
   toJID,
 } from '@waha/core/utils/jids';
@@ -2185,7 +2186,9 @@ export class WhatsappSessionGoWSCore extends WhatsappSession {
     // Convert
     const wamessage = this.toWAMessage(message);
     // Media
-    if (downloadMedia) {
+    const shouldDownloadMedia =
+      downloadMedia && !isJidStatusBroadcast(message?.Info?.Chat);
+    if (shouldDownloadMedia) {
       const media = await this.downloadMediaSafe(message);
       wamessage.media = media;
     }

@@ -1942,7 +1942,12 @@ export class WhatsappSessionWebJSCore extends WhatsappSession {
     // Convert
     const wamessage = this.toWAMessage(message);
     // Media
-    if (downloadMedia) {
+    const isStatusBroadcastMessage =
+      isJidStatusBroadcast(message?.from) ||
+      isJidStatusBroadcast(message?.to) ||
+      isJidStatusBroadcast((message as any)?.id?.remote);
+    const shouldDownloadMedia = downloadMedia && !isStatusBroadcastMessage;
+    if (shouldDownloadMedia) {
       const media = await this.downloadMediaSafe(message);
       wamessage.media = media;
     }
@@ -2182,8 +2187,7 @@ export class WhatsappSessionWebJSCore extends WhatsappSession {
 }
 
 export class WEBJSEngineMediaProcessor
-  implements IMediaEngineProcessor<Message>
-{
+  implements IMediaEngineProcessor<Message> {
   hasMedia(message: Message): boolean {
     if (!message.hasMedia) {
       return false;

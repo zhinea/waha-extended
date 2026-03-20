@@ -71,7 +71,12 @@ import { AckToStatus, StatusToAck } from '@waha/core/utils/acks';
 import { pairs } from '@waha/utils/pairs';
 import { ExtractMessageKeysForRead } from '@waha/core/utils/convertors';
 import { parseMessageIdSerialized } from '@waha/core/utils/ids';
-import { isJidNewsletter, toCusFormat, toJID } from '@waha/core/utils/jids';
+import {
+  isJidNewsletter,
+  isJidStatusBroadcast,
+  toCusFormat,
+  toJID,
+} from '@waha/core/utils/jids';
 import { DistinctAck } from '@waha/core/utils/reactive';
 import { flipObject, splitAt } from '@waha/helpers';
 import { PairingCodeResponse } from '@waha/structures/auth.dto';
@@ -2541,7 +2546,9 @@ export class WhatsappSessionNoWebCore extends WhatsappSession {
       return null;
     }
     // Media
-    if (downloadMedia) {
+    const shouldDownloadMedia =
+      downloadMedia && !isJidStatusBroadcast(message?.key?.remoteJid);
+    if (shouldDownloadMedia) {
       const media = await this.downloadMediaSafe(message);
       wamessage.media = media;
     }
